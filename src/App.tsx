@@ -1,26 +1,38 @@
 import React from 'react';
-import logo from './logo.svg';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
+import { Login } from './components/Login';
+import { useAppSelector, useAppDispatch } from './redux/reduxHooks';
+import { Home } from './components/Home';
+import { Register } from './components/Register';
+import { reloaded } from './redux/authSlice';
 
-function App() {
+export const App: React.FC = () => {
+  const state = useAppSelector(state => state.authSlice);
+  const dispatch = useAppDispatch();
+
+  if(localStorage.getItem('isAuth')) {
+    dispatch(reloaded());
+  }
+  
+  if (!state.isAuth && localStorage.getItem('isAuth') !== '200') {
+    return (
+      <div className='main'>
+        <Routes>
+          <Route path="/*" element={<Navigate replace to='/login' />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </div>
+    )
+  }
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='main'>
+      <Routes>
+        <Route path="/login" element={<Navigate replace to='/' />} />
+        <Route path="/" element={<Home />} />
+      </Routes>
     </div>
-  );
+  )
 }
-
-export default App;
